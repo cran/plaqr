@@ -1,0 +1,10 @@
+import(quantreg)
+import(splines)
+
+export(plaqr)
+export(nonlinEffect)
+export(threshold)
+export(predictInt)
+S3method("plot","plaqreffect")
+S3method("print", "plaqreffect")
+S3method("print", "thresh")

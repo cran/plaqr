@@ -1,0 +1,13 @@
+Package: plaqr
+Title: Partially Linear Additive Quantile Regression
+Description: Estimation, prediction, thresholding, and plotting for partially linear additive quantile regression.  Intuitive functions for fitting and plotting partially linear additive quantile regression models.  Uses and works with functions from the 'quantreg' package.
+Version: 1.0
+Authors@R: person("Adam", "Maidman",  role = c("cre","aut"), email =  "maidm004@umn.edu")
+Maintainer: Adam Maidman <maidm004@umn.edu>
+Depends: R (>= 3.0), quantreg, splines
+License: GPL (>= 2)
+Repository: CRAN
+Date/Publication: 2015-04-18 10:59:33
+Packaged: 2015-04-17 14:49:00 UTC; maidm004
+Author: Adam Maidman [cre, aut]
+NeedsCompilation: no
