@@ -44,8 +44,8 @@ nonlinEffect <- function(fit, select=NULL, renames=NULL)
   }
 
   var.index <- match(fit$nonlinear, plotvars)
-  ylab <- "Effect"
-  nonlincoef <- coef(fit)[-(1:(1+length(fit$linear)))]
+  ylab <- deparse(fit$formula[[2]])
+  nonlincoef <- coef(fit)[((1-fit$basis*length(fit$nonlinear)):0) + length(coef(fit))]
   nrw <- nrow(fit$z)
 
   for(i in 1:z){

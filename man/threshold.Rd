@@ -11,7 +11,7 @@ Classification of a numerical response into a ``high'' class and ``low'' class u
 threshold(fit, t, newdata=NULL, ...)
 }
 \arguments{
-  \item{fit}{any model with a continuous response.}
+  \item{fit}{any model with a numerical response.}
   \item{t}{the desired threshold value.  All values above \code{t} will be labeled ``1''and all values below \code{t} will be labeled ``0''.}
   \item{newdata}{an optional data frame in which to look for variables with which to predict. If omitted, no prediction is done.}
   \item{...}{additional argument(s) for methods in the \code{predict} function.}

@@ -1,7 +1,7 @@
-1f984187456d9039b48280f4eeccf444 *DESCRIPTION
-b7e4cb5c17718c7356cf604c39d084b3 *NAMESPACE
+ede1015aec05ed96a3df0dd54ea043c0 *DESCRIPTION
+3c5831dccacfa8540c679504d5fa4eb0 *NAMESPACE
 dd277d66f85ee09c1efbc95f435809f1 *R/plaqr.R
-cde45fc58bc6842bd9ec6a8713976246 *R/plaqreffect.R
+9bb0dff6c734424cbe180f7db0f6df03 *R/plaqreffect.R
 718cb6b94ce3bb1de8296b874ab6e86d *R/predictInt.R
 dd11d25528e0cec2a9662b7329818d26 *R/thresh.R
 ee39a3d98e56fe51ed7e2d2673e065ae *data/simData.rda
@@ -12,4 +12,4 @@ ab874d0582f8a21c064eb1f7d63d95b2 *man/plot.plaqreffect.Rd
 7258a66bfa99d3dce48dcc8f3f4ce431 *man/print.plaqreffect.Rd
 32c70261b590d37bba22aea106a4b5a5 *man/print.thresh.Rd
 e067b8b3071d1e1bfa89d3069730a35f *man/simData.Rd
-311b5384090859e476c74ea36d01c143 *man/threshold.Rd
+66dadb7079a19802dab1fe71422e60a8 *man/threshold.Rd
