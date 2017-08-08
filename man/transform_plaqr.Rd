@@ -1,13 +1,13 @@
-\name{plaqr}
-\alias{plaqr}
-\title{Partially Linear Additive Quantile Regression}
+\name{transform_plaqr}
+\alias{transform_plaqr}
+\title{Transformation for Partially Linear Additive Quantile Regression}
 \description{
-Returns an object of class \code{"plaqr"} and \code{"rq"} that represents a quantile regression fit.  A nonlinear term z is transformed using \code{bs(z)} before fitting the model.  The formula of the model (as it appears in \code{R}) becomes \code{y~ x1 + x2 + bs(z1) + bs(z2)} where \code{bs(z1)} is a B-spline.
+Returns the estimated transformation parameter for the one-parameter symmetric transformation (Geraci and Jones, 2015).  Confidence intervals for the transformation parameter can also be created using the bootstrap.  The response variable must be strictly positive; a constant can be added to the variable to ensure that all values are positive.
 }
 \usage{
-plaqr(formula, nonlinVars=NULL, tau=.5, data=NULL, subset,   
-            weights, na.action, method = "br", model = TRUE, 
-            contrasts = NULL, splinesettings=NULL, ...)
+transform_plaqr(formula, nonlinVars=NULL, tau=.5, data=NULL, lambda=seq(0,1,by=.05),
+                confint=NULL, B=99, subset, weights, na.action, method = "br", 
+                contrasts = NULL, splinesettings=NULL)
 }
 \arguments{
   \item{formula}{
@@ -27,6 +27,15 @@ plaqr(formula, nonlinVars=NULL, tau=.5, data=NULL, subset,
     search list.  This may also be a single number to handle some special  
     cases -- see below for details.   
   }
+  \item{lambda}{
+    a real-valued sequence of possible transformation parameters.  0 corresponds to the log transformation and 1 corresponds to the identity.  The transformation is symmetric so a negative transformation parameter is redundant and can be avoided.  See Geraci and Jones (2015) for more information on the one-parameter, symmetric transformation.
+  }
+  \item{confint}{
+    a \code{confint} confidence interval for the transformation parameter will be created if \code{confint} is a number between 0 and 1 (otherwise automatically creates 95\% CI).  Otherwise, no confidence interval will be created.  The bootstrap is used to create the confidence interval.
+  }
+  \item{B}{
+    the number of bootstrap replications for the confidence interval.  If no confidence interval is being created, this argument is ignored.
+  }
   \item{subset}{
     an optional vector specifying a subset of observations to be
     used in the fitting process.}
@@ -44,9 +53,6 @@ plaqr(formula, nonlinVars=NULL, tau=.5, data=NULL, subset,
     The default (with \code{na.fail}) is to create an error if any missing values are  
     found.  A possible alternative is \code{na.omit}, which 
     deletes observations that contain one or more missing values. 
-  }
-  \item{model}{if TRUE then the model frame is returned.  This is
-    essential if one wants to call summary subsequently.
   }
   \item{method}{
     the algorithmic method used to compute the fit.  There are several
@@ -83,74 +89,38 @@ plaqr(formula, nonlinVars=NULL, tau=.5, data=NULL, subset,
   \item{splinesettings}{
     a list of length equal to the number of nonlinear effects containing arguments to pass to the \code{bs} function for each term.  Each element of the list is either \code{NULL} or a list with named elements correpsonding to the arguments in \code{bs}.  If not \code{NULL}, the first element of splinesettings corresponds to the first nonlinear effect and so on.
   }
-  \item{...}{
-    additional arguments for the fitting routines 
-    (see the \code{rq} function in the `quantreg' package ). 
-  }
 }
 \value{
 Returns the following:
-  \item{coefficients}{
-    Coefficients from the fitted model
+  \item{parameter}{
+    The transformation parameter
   }
-  \item{x}{
-  optionally the model matrix, if \code{x=TRUE}.
+  \item{Y}{
+  The values of the transformed response
   }
-  \item{y}{
-  optionally the response, if \code{y=TRUE}.
+  \item{confint}{
+  If a confidence interval is created, this is the confidence interval for the transformation parameter.  Otherwise, \code{NULL}.  
   }
-  \item{residuals}{
-  the residuals from the fit.
+  \item{U}{
+  If a confidence interval is created, a \code{B} by \code{n} matrix containing the indices used in each bootstrap sample.  Otherwise, \code{NULL}.
   }
-  \item{dual}{
-  the vector dual variables from the fit.
-  }
-  \item{fitted.values}{
-  fitted values from the fit.
-  }
-  \item{formula}{
-  the formula that was used in the \code{rq} function.
-  }
-  \item{rho}{
-  the value of the objective function at the solution.
-  }
-  \item{model}{
-  optionally the model frame, if \code{model=TRUE}
-  }
-  \item{linear}{
-  the linear terms used in the model fit.
-  }
-  \item{nonlinear}{
-  the nonlinear terms used in the model fit.
-  }
-  \item{z}{
-  the values of the nonlinear terms.
-  }
-  
+  \item{P}{
+  If a confidence interval is created, a \code{B} length vector containing the transformation parameter estimated in each bootstrap sample.  Otherwise, \code{NULL}.
+  }  
 }
 \references{
-Hastie, T. J. (1992) Generalized additive models. Chapter 7 of Statistical Models in S eds J. M. Chambers and T. J. Hastie, Wadsworth & Brooks/Cole.
-
-Koenker, R. W. (2005). Quantile Regression, Cambridge U. Press.
-
-Sherwood, B. and Wang, L. (2016). Partially linear additive quantile regression in ultra-high
-dimension. The Annals of Statistics 44, 288-317.
+Geraci, M. and Jones, M. (2015). Improved transformation-based quantile regression. Canadian Journal of Statistics 43, 118-132.
 
 Maidman, A., Wang, L. (2017).  New Semiparametric Method for Predicting High-Cost Patients. Preprint.
 }
 \examples{
 data(simData)
 
-ss <- vector("list", 2)
-ss[[2]]$degree <- 5
-ss[[2]]$Boundary.knots <- c(-1, 1)
+simData$Y <- exp(simData$y)
 
-plaqr(y~., nonlinVars=~z1+z2, data=simData) 
-#same as plaqr(formula= y~x1+x2+x3, nonlinVars=~z1+z2, data=simData)
+transform_plaqr(Y~x1+x2+x3, nonlinVars=~z1+z2, data=simData) 
 
-plaqr(y~0, nonlinVars=~z1+z2, data=simData, splinesettings=ss) #no linear terms in the model
-
-plaqr(y~., data=simData) #all linear terms
+transform_plaqr(Y~x1+x2+x3, nonlinVars=~z1+z2, confint=.95, data=simData) 
 }
 
 

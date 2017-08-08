@@ -34,9 +34,9 @@ nonlinEffect <- function(fit, select=NULL, renames=NULL)
   }
 
   # Initialize list of plots and create plot titles
-  z <- length(plotvars)
-  nonlineffs <- vector("list", z)
-  if(length(renames)==z){
+  nz <- length(plotvars)
+  nonlineffs <- vector("list", nz)
+  if(length(renames)==nz){
     covnames <- renames
   } else {
     covnames <- plotvars
@@ -44,31 +44,35 @@ nonlinEffect <- function(fit, select=NULL, renames=NULL)
   }
 
   var.index <- match(fit$nonlinear, plotvars)
-  ylab <- deparse(fit$formula[[2]])
-  nonlincoef <- coef(fit)[((1-fit$basis*length(fit$nonlinear)):0) + length(coef(fit))]
-  nrw <- nrow(fit$z)
+  var.index <- var.index[!is.na(var.index)]
+  ylab <- names(attr(fit$terms, "dataClasses"))[1]
 
-  for(i in 1:z){
+  nlin <- length(fit$linear)
+  data <- cbind( fit$x[,1+1:nlin], fit$z)
+  data[] <- 0
+  N <- nrow(data)
+
+  for(i in 1:nz){
     xlab <- covnames[i]
 
-    z_col <- which(var.index==i)
-    coef.index <- (1 + (z_col-1)*fit$basis):(fit$basis + (z_col-1)*fit$basis)
-    rnge_z <- range(fit$z[,z_col])
+    data[ , nlin+var.index[i] ] <- fit$z[,var.index[i]]
+    ghat <- suppressWarnings(predict(fit, newdata=data))
+    mghat <- mean(ghat)
+    ghat <- ghat - mghat
+    z <- cbind( z=fit$z[,var.index[i]], effect=ghat )
 
-    pp <- seq(rnge_z[1], rnge_z[2], length.out=nrw)
-    ghat <- bs(pp, degree=fit$basis, Boundary.knots=rnge_z) %*% nonlincoef[coef.index]
-    ghat <- ghat - mean(ghat)
+    pp <- seq( min(fit$z[,var.index[i]]), max(fit$z[,var.index[i]]), length.out=N )
+    data[ , nlin+var.index[i] ] <- pp
+    ghat <- suppressWarnings(predict(fit, newdata=data))
+    ghat <- ghat - mghat
     pp <- cbind(pp=pp, effect=ghat)
-    colnames(pp) <- c("pp", "effect")
-
-    ghat <- bs(fit$z[,z_col], degree=fit$basis, Boundary.knots=rnge_z) %*% nonlincoef[coef.index]
-    ghat <- ghat - mean(ghat)
-    z <- cbind(z=fit$z[,z_col], effect=ghat)
-    colnames(z) <- c("z", "effect")
 
     nonlineffs[[i]] <- list(z=z, pp=pp, xlab=xlab, ylab=ylab, tau=fit$tau, var=plotvars[i],
                             name=xlab, call=fit$call, formula=fit$formula)
+
+    data[ , nlin+var.index[i] ] <- 0
   }
+
   names(nonlineffs) <- plotvars
   class(nonlineffs) <- "plaqreffect"
   return(nonlineffs)
